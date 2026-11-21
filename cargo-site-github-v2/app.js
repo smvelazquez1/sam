@@ -159,7 +159,7 @@ document.addEventListener("click", function (e) {
   /* ── FINDING A PAGE'S MAIN PICTURE ── */
   function freightUrl(hash, name, w) { return 'https://freight.cargo.site/w/' + w + '/q/75/i/' + hash + '/' + encodeURIComponent(name); }
   function resize(src) {                                                     // ask Cargo for a thumbnail-sized copy, not the full original
-    if (/^images\/(?!thumbs\/)/.test(src)) return src.replace(/^images\//, 'images/thumbs/');   // GitHub copy: small thumbnails live in images/thumbs/
+    if (/^images\/(?!thumb-)/.test(src)) return src.replace(/^images\//, 'images/thumb-');   // GitHub copy: each small carousel picture sits beside its original, named thumb-<name>
     if (/freight\.cargo\.site\/w\/\d+\//.test(src)) return src.replace(/\/w\/\d+\//, '/w/' + THUMB_WIDTH + '/');
     if (/freight\.cargo\.site\/t\/original\/i\//.test(src)) return src.replace(/\/t\/original\/i\//, '/w/' + THUMB_WIDTH + '/q/75/i/');
     return src;
