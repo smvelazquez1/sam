@@ -1,0 +1,312 @@
+/* ═══ BASE (what Cargo supplied itself) ═══ */
+html { font-size: 1.44vh; touch-action: manipulation; }          /* Cargo sizes every "rem" from the window height: 1.44% of it */
+@media (max-width: 768px) { html { font-size: calc(1.44vh * 1.4); } }
+html, body { margin: 0; padding: 0; min-height: 100vh; }
+body {
+	position: relative;
+	background: #fff;
+	color: rgba(0, 0, 0, 0.88);
+	font-family: "Hanken Grotesk", "Diatype Variable", -apple-system, "system-ui", "Helvetica Neue", Arial, sans-serif;
+	font-size: 1.6rem;
+	font-weight: 450;
+	-webkit-font-smoothing: antialiased;
+	text-size-adjust: none;
+}
+h1 { font-weight: 350; letter-spacing: -0.01em; }
+p { font-weight: 450; }
+a { color: inherit; }
+a:active { opacity: 0.7; }
+.page { background: transparent; }
+.page-layout, .page-content, bodycopy { display: block; width: 100%; box-sizing: border-box; }
+
+/* the thumbnail carousel sits along the bottom, centred */
+.dock {
+	position: fixed;
+	left: 50%;
+	bottom: 3.4vh;
+	transform: translateX(-50%);
+	width: 42%;
+	z-index: 20;
+}
+@media (max-width: 768px) { .dock { width: 92%; } }
+
+/* Horizontal slider wrapper: ONLY on the live site (html.slider-live is added by the first Global JS script; the Cargo editor keeps the normal vertical layout) */
+html.slider-live div:has(> .stacked-page:not(.pinned) + .stacked-page:not(.pinned)) {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  height: 100vh !important;
+}
+
+/* Each slide forced back into the visible viewport */
+html.slider-live div:has(> .stacked-page:not(.pinned) + .stacked-page:not(.pinned)) > .stacked-page:not(.pinned) {
+  flex: 0 0 100vw !important;
+  width: 100vw !important;
+  min-width: 100vw !important;
+  height: 100vh !important;
+  top: 0 !important;
+  left: auto !important;
+  transform: none !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  overflow-y: auto !important;
+  scroll-snap-align: start;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   BACKGROUND-IMAGE PAGE (.bg-page): a full-width picture with a column of text on the left.
+   Any page that contains a .bg-page block is switched to full width automatically (no page-by-page CSS).
+   The markup is in bg-page-v1.html. Change the look with the variables just below.
+   ═══════════════════════════════════════════════════════════════════ */
+.bg-page {
+	--bg-page-ink: rgba(0, 0, 0, 0.88);                       /* text colour */
+	--bg-page-shade: linear-gradient(90deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0.22) 30%, rgba(255,255,255,0) 52%);   /* soft wash behind the text, from the left; "none" for no wash */
+	--bg-page-fit: contain;                                   /* contain = the WHOLE picture always shows, nothing cropped; cover = fills the screen and crops the edges */
+	--bg-page-position: center;                               /* where the picture sits: center, right center, left center … */
+	--bg-page-top: 2vh;                                       /* empty space above the picture */
+	--bg-page-side: 3vw;                                      /* empty space left and right of the picture: bigger = smaller picture */
+	--bg-page-bottom: 4vh;                                    /* empty space under the picture (the live site raises this to clear the carousel, just below) */
+	--bg-page-editor-offset: 120px;                           /* only inside the Cargo editor: room for its toolbar, so the block is not taller than the screen you see */
+	--bg-page-width: 40rem;                                   /* how wide the text column is */
+	--bg-page-pad: clamp(1.25rem, 6vw, 6rem);                 /* space above / below / right of the text */
+	--bg-page-inset: clamp(2rem, 13vw, 13rem);                /* space between the text and the LEFT edge: bigger = the text sits further right */
+	box-sizing: border-box;
+	width: 100%;
+	min-height: 100vh;
+	min-height: 100svh;
+	display: flex;
+	align-items: center;                                      /* text centred top-to-bottom; change to flex-start / flex-end to move it */
+	justify-content: flex-start;                              /* text on the left */
+	padding: var(--bg-page-pad) var(--bg-page-pad) var(--bg-page-pad) var(--bg-page-inset);
+	position: relative;
+	isolation: isolate;                                       /* keeps the picture and wash behind the text, inside this block */
+	color: var(--bg-page-ink);
+}
+
+/* the picture: --bg is set on the block: style="--bg: url('…')". It sits in its own box, inset from the edges so it comes out smaller,
+   and the box stops above the carousel (--bg-page-bottom) so the two never touch. */
+.bg-page::before {
+	content: "";
+	position: absolute;
+	top: var(--bg-page-top);
+	right: var(--bg-page-side);
+	bottom: var(--bg-page-bottom);
+	left: var(--bg-page-side);
+	z-index: -2;
+	background: var(--bg) var(--bg-page-position) / var(--bg-page-fit) no-repeat;
+	pointer-events: none;
+}
+
+/* the soft wash over the whole block */
+.bg-page::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	background: var(--bg-page-shade);
+	pointer-events: none;
+}
+
+html.slider-live .bg-page {                                   /* the live site: leave room for the carousel along the bottom */
+	--bg-page-bottom: 150px;
+}
+
+html:not(.slider-live) .bg-page {                             /* the Cargo editor (not the live site) */
+	min-height: calc(100vh - var(--bg-page-editor-offset));
+	min-height: calc(100svh - var(--bg-page-editor-offset));
+}
+
+.bg-page--dark {                                              /* add this class for a dark wash and white text */
+	--bg-page-ink: rgba(255, 255, 255, 0.95);
+	--bg-page-shade: linear-gradient(90deg, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.2) 30%, rgba(0,0,0,0) 52%);
+}
+
+.bg-page__text {
+	width: 100%;
+	max-width: var(--bg-page-width);
+}
+
+.bg-page h1 {
+	font-size: clamp(2.6rem, 6vw, 5.75rem);
+	line-height: 1.02;
+	margin: 0 0 1.4rem 0;
+	color: var(--bg-page-ink);
+}
+
+.bg-page p {
+	font-size: clamp(1.05rem, 0.3vw + 0.93rem, 1.3rem);
+	line-height: 1.4;
+	margin: 0 0 1em 0;
+	color: var(--bg-page-ink);
+}
+
+.bg-page p:last-child {
+	margin-bottom: 0;
+}
+
+/* a page holding a .bg-page loses Cargo's side padding and width limit, so the picture runs edge to edge */
+.page:has(.bg-page) .page-layout {
+	max-width: 100%;
+	width: 100%;
+}
+
+.page:has(.bg-page) .page-content {
+	padding: 0;
+	width: 100%;
+	align-items: stretch;
+}
+
+.page:has(.bg-page) bodycopy {
+	width: 100%;
+}
+
+@media (max-width: 768px) {
+	.bg-page {
+		--bg-page-inset: var(--bg-page-pad);
+		align-items: flex-end;                                /* phones: the text sits at the bottom so the picture stays visible above it */
+		--bg-page-shade: linear-gradient(0deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.28) 32%, rgba(255,255,255,0) 60%);
+	}
+	.bg-page--dark {
+		--bg-page-shade: linear-gradient(0deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.25) 32%, rgba(0,0,0,0) 60%);
+	}
+}
+
+
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   EDGE TEXT (.edge-text): words set along the edges of the screen, the top one straight,
+   the left one reading upward, the right one reading downward, the bottom one straight.
+   It sits on a PINNED page, floats over everything, and never blocks a click.
+   The markup is in edge-text-v1.html. Change the look with the variables just below.
+   ═══════════════════════════════════════════════════════════════════ */
+.edge-text {
+	--edge-ink: rgba(0, 0, 0, 0.85);                          /* text colour */
+	--edge-size: clamp(0.95rem, 1.5vw, 1.6rem);               /* letter size */
+	--edge-space: 0.45em;                                     /* space between letters */
+	--edge-weight: 400;
+	--edge-inset: clamp(0.9rem, 2.2vw, 2.25rem);              /* distance from the screen edge */
+	--edge-align-top: center;                                 /* where along each edge the words sit: flex-start | center | flex-end */
+	--edge-align-bottom: center;
+	--edge-align-left: center;
+	--edge-align-right: center;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	height: 100svh;
+	z-index: 30;
+	pointer-events: none;                                     /* the layer never blocks the page underneath */
+	color: var(--edge-ink);
+	font-size: var(--edge-size);
+	font-weight: var(--edge-weight);
+	letter-spacing: var(--edge-space);
+	text-transform: uppercase;
+	line-height: 1;
+	padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+.edge-text a {
+	color: inherit;
+	text-decoration: none;
+	pointer-events: auto;                                     /* links in the words still work */
+}
+
+.edge-text__top,
+.edge-text__bottom,
+.edge-text__left,
+.edge-text__right {
+	position: absolute;
+	display: flex;
+	white-space: nowrap;
+}
+
+.edge-text__top,
+.edge-text__bottom {
+	left: var(--edge-inset);
+	right: var(--edge-inset);
+}
+
+.edge-text__top    { top: var(--edge-inset);    justify-content: var(--edge-align-top); }
+.edge-text__bottom { bottom: var(--edge-inset); justify-content: var(--edge-align-bottom); }
+
+.edge-text__left,
+.edge-text__right {
+	top: var(--edge-inset);
+	bottom: var(--edge-inset);
+	writing-mode: vertical-rl;                                /* letters turned a quarter: reads top to bottom */
+}
+
+.edge-text__left  { left: var(--edge-inset);  transform: rotate(180deg); justify-content: var(--edge-align-left); }   /* turned the other way: reads bottom to top */
+.edge-text__right { right: var(--edge-inset); justify-content: var(--edge-align-right); }
+
+.edge-text__left,
+.edge-text__right { align-items: center; }
+
+/* the spacing after the last letter would push the word off-centre: take it back */
+.edge-text__top > *,
+.edge-text__bottom > * { margin-right: calc(var(--edge-space) * -1); }
+.edge-text__left > *,
+.edge-text__right > * { margin-bottom: calc(var(--edge-space) * -1); }
+
+/* Cargo wraps page content in boxes that trap "fixed" elements (and are 0 tall here), which squashed the side words
+   to the top of the screen: free them, so the edge text is measured against the screen itself */
+.page:has(.edge-text),
+.page:has(.edge-text) .page-layout,
+.page:has(.edge-text) .page-content,
+.page:has(.edge-text) bodycopy {
+	contain: none !important;
+	transform: none !important;
+	filter: none !important;
+	pointer-events: none;
+}
+
+.page:has(.edge-text) .page-layout,
+.page:has(.edge-text) .page-content {
+	padding: 0;
+	min-height: 0;
+}
+
+@media (max-width: 768px) {
+	.edge-text {
+		--edge-size: clamp(0.8rem, 3.2vw, 1.1rem);
+		--edge-space: 0.35em;
+		--edge-inset: 0.75rem;
+	}
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   NO SCROLLBARS on the live site. Scrolling and swiping still work; only the bars are hidden.
+   The Cargo editor is left alone. (The custom scrollbar styling was removed; it is in global-css-v15.css if it is ever wanted again.)
+   ═══════════════════════════════════════════════════════════════════ */
+html.slider-live,
+html.slider-live * {
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+html.slider-live::-webkit-scrollbar,
+html.slider-live *::-webkit-scrollbar {
+	display: none;
+	width: 0;
+	height: 0;
+}
+
+
+/* phones: the text sits at the bottom, so lift it clear of the carousel */
+@media (max-width: 768px) {
+	html.slider-live .bg-page { padding-bottom: calc(var(--bg-page-pad) + 130px); }
+	html.slider-live .bg-page { --bg-page-bottom: 150px; }
+}
