@@ -15,6 +15,6 @@ A plain HTML/CSS/JS copy of the Cargo site. No build step.
   Put a small (about 500px wide) copy named `thumb-<same file name>` in `images/` for the carousel.
 - **Add a page:** copy one `<section>` block, give it a new `id` and `page-url` (the same word), a new picture and text.
 - **Brush look:** the `CFG` block at the top of the brush script inside `app.js` (colour, thickness, texture, `intro`).
-- **Font:** Cargo's Diatype Variable is licensed to Cargo, so this copy uses Hanken Grotesk (free, Google Fonts).
+- **Font:** Cargo's Diatype Variable is licensed to Cargo, so this copy uses Plus Jakarta Sans (free, Google Fonts).
 
 Notes carried over from Cargo: the placeholder text is still the template's; `object7` still says "Object No.6"; `object4`/`object5` pictures are placeholders.
